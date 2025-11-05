@@ -1,0 +1,41 @@
+---
+- name: Deploy a website with template and handlers
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
+    - name: Ensure website directory exists
+      file:
+        path: /var/www/html/mywebsite
+        state: directory
+        owner: apache
+        group: apache
+        mode: '0755'
+    - name: Deploy website configuration template
+      template:
+        src: mywebsite.conf.j2
+        dest: /etc/httpd/conf.d/mywebsite.conf
+      notify: Resart Apache
+    - name: Create index.html for the website    
+      copy:
+        dest: /var/www/html/mywebsite/index.html
+        content: "Welcome to my Ansible-powered website!"
+        owner: apache
+        group: apache
+        mode: '0644'
+    - name: Ensure Apache is running and enabled
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+    - name: Print sucess message
+      debug:
+         msg: "Website deployed successfully on {{ ansible_hostname }}"
+  handlers:
+    - name: Resart Apache
+      service:
+        name: httpd
+        state: restarted               
