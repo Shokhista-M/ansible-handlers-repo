@@ -1,0 +1,12 @@
+<VirtualHost *:80>
+    ServerName {{ ansible_hostname }}
+    DocumentRoot /var/www/html/mywebsite
+
+    <Directory /var/www/html/mywebsite>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog /var/log/httpd/mywebsite_error.log
+    CustomLog /var/log/httpd/mywebsite_access.log combined
+</VirtualHost>
